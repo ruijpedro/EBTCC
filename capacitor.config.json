@@ -1,0 +1,6 @@
+{
+  "appId": "pt.rjp.inspecoes",
+  "appName": "Inspecoes_RJP",
+  "webDir": ".",
+  "server": {"androidScheme": "https"}
+}

@@ -1,0 +1,14 @@
+{
+  "name": "inspecoes-rjp",
+  "version": "1.2.0",
+  "scripts": {
+    "cap:init": "npx cap init Inspecoes_RJP pt.rjp.inspecoes --web-dir .",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/cli": "latest",
+    "@capacitor/core": "latest"
+  }
+}
