@@ -25,6 +25,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Prepare web folder
+        run: |
+          rm -rf www
+          mkdir www
+          cp index.html manifest.json service-worker.js www/
+          cp -r src www/src
+
       - name: Add Android platform
         run: |
           npx cap add android || true
