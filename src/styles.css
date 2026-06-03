@@ -33,3 +33,8 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 .map-node.warn{background:var(--amber)}.map-node.bad{background:var(--red)}
 .map-name{font-weight:800}.map-meta{color:#53645b;font-size:12px}.map-badge{background:#eef6f1;border:1px solid #cfe4d8;border-radius:999px;padding:6px 10px;font-size:12px}
 @media(max-width:900px){.map-row{grid-template-columns:34px 1fr}.map-badge{grid-column:2}}
+
+
+.brand-logo{width:120px;max-height:64px;object-fit:contain;background:white;border-radius:12px;padding:6px}
+.topbar-logo{height:44px;max-width:190px;object-fit:contain}
+@media(max-width:900px){.topbar-logo{height:34px;max-width:145px}.brand-logo{width:130px}}
