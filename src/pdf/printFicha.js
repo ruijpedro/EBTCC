@@ -39,9 +39,9 @@ export function printFicha(data, checklist){
 <style>
   @page{size:A4 landscape;margin:9mm}
   body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#111;font-size:9px}
-  .page{position:relative;min-height:188mm;padding-left:20mm;page-break-after:always}
-  .vertical-title{position:absolute;left:0;top:42mm;writing-mode:vertical-rl;transform:rotate(180deg);font-size:18px;font-weight:700;letter-spacing:.5px}
-  .vertical-sub{position:absolute;left:10mm;top:62mm;writing-mode:vertical-rl;transform:rotate(180deg);font-size:16px;font-weight:700}
+  .page{position:relative;min-height:188mm;padding-left:0;page-break-after:always}
+  .ip-logo{position:absolute;left:0;top:0;width:58mm;height:auto}
+  .doc-title{text-align:center;font-size:20px;font-weight:800;margin:2mm 0 0}.doc-subtitle{text-align:center;font-size:16px;font-weight:800;margin:3mm 0 12mm}.top-line{border-top:3px solid #111;margin:8mm 0 3mm}
   .head{display:grid;grid-template-columns:1.1fr 1.3fr 1.1fr;gap:8mm;margin-bottom:4mm}
   .head div{line-height:1.55}.head b{font-weight:700}
   .number{position:absolute;right:0;top:0;border:1px solid #111;padding:2mm 4mm;font-weight:700}
@@ -65,8 +65,10 @@ export function printFicha(data, checklist){
 <body>
   <div class="page">
     <div class="number">${escapeHtml(data.number || "")}</div>
-    <div class="vertical-title">FICHA DE INSPEÇÃO</div>
-    <div class="vertical-sub">Construção Civil</div>
+    <img class="ip-logo" src="${assetUrl('assets/ip-logo.png')}">
+    <div class="doc-title">FICHA DE INSPEÇÃO</div>
+    <div class="doc-subtitle">Construção Civil</div>
+    <div class="top-line"></div>
     <div class="head">
       <div>
         <b>AM SIGMA:</b> 543528659<br>
@@ -114,6 +116,11 @@ export function printFicha(data, checklist){
   w.document.open();
   w.document.write(html);
   w.document.close();
+}
+
+function assetUrl(path){
+  const base = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+  return base + path;
 }
 
 function escapeHtml(value){
