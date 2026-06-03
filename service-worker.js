@@ -1,4 +1,4 @@
-const CACHE_NAME = "inspecoes-rjp-v1-2-2";
+const CACHE_NAME = "inspecoes-rjp-v1-3-2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,7 +7,10 @@ const ASSETS = [
   "./src/app.js",
   "./src/data/stations.js",
   "./src/data/checklist.js",
-  "./src/pdf/printFicha.js"
+  "./src/pdf/printFicha.js",
+  "./assets/ip-logo.png",
+  "./assets/icons/icon-192.png",
+  "./assets/icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {

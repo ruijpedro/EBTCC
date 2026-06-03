@@ -1,10 +1,6 @@
-# Inspeções_RJP v1.2
+# Inspeções_RJP v1.3
 
 Novidades:
-- Mapa esquemático da Linha do Oeste
-- Estados por estação no mapa
-- Acesso direto do mapa para nova inspeção
-- Preparação para APK Android com Capacitor
-- Workflow GitHub Actions para gerar APK debug
-
-Atualiza no GitHub substituindo/adicionando todos estes ficheiros e pastas.
+- Logótipo da Infraestruturas de Portugal na app.
+- Ícone da app/PWA com o símbolo IP.
+- Logótipo IP no PDF da ficha de inspeção, como no modelo de ficha.
