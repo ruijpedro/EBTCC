@@ -29,48 +29,40 @@ jobs:
         run: |
           rm -rf www
           mkdir www
-
-          cp index.html www/
-          cp manifest.json www/
-          cp service-worker.js www/
-
+          cp index.html manifest.json service-worker.js www/
           cp -r src www/src
-
-          if [ -d assets ]; then
-            cp -r assets www/assets
-          fi
+          cp -r assets www/assets
 
       - name: Add Android platform
         run: |
           npx cap add android || true
           npx cap sync android
 
-      - name: Apply Android app icon
+      - name: Force Android app icon
         run: |
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
-
           cp assets/android/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          cp assets/android/mipmap-mdpi/ic_launcher_round.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
           cp assets/android/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          cp assets/android/mipmap-hdpi/ic_launcher_round.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-
           cp assets/android/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          cp assets/android/mipmap-xhdpi/ic_launcher_round.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
           cp assets/android/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp assets/android/mipmap-xxhdpi/ic_launcher_round.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
           cp assets/android/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          cp assets/android/mipmap-mdpi/ic_launcher_round.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          cp assets/android/mipmap-hdpi/ic_launcher_round.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          cp assets/android/mipmap-xhdpi/ic_launcher_round.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+          cp assets/android/mipmap-xxhdpi/ic_launcher_round.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
           cp assets/android/mipmap-xxxhdpi/ic_launcher_round.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          s = s.replace('android:icon="@mipmap/ic_launcher"', 'android:icon="@mipmap/ic_launcher"')
+          s = s.replace('android:roundIcon="@mipmap/ic_launcher_round"', 'android:roundIcon="@mipmap/ic_launcher_round"')
+          p.write_text(s)
+          PY
 
       - name: Build Debug APK
         run: |
