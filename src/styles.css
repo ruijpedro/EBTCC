@@ -38,3 +38,5 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 .brand-logo{width:120px;max-height:64px;object-fit:contain;background:white;border-radius:12px;padding:6px}
 .topbar-logo{height:44px;max-width:190px;object-fit:contain}
 @media(max-width:900px){.topbar-logo{height:34px;max-width:145px}.brand-logo{width:130px}}
+
+.pill{display:none!important}

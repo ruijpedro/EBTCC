@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Inspeções_RJP</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="stylesheet" href="src/styles.css">
 </head>
@@ -33,7 +35,7 @@
         <img class="topbar-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <button id="menuBtn">☰</button>
         <h2 id="viewTitle">Dashboard</h2>
-        <span class="pill">RJP Manutenção</span>
+        
       </header>
 
       <section id="dashboard" class="view active">
@@ -95,7 +97,7 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           </div>
           <div class="actions">
             <button class="btn secondary" id="saveInspection">Guardar Inspeção</button>
-            <button class="btn pdf" id="generatePdf">Gerar PDF</button>
+            <button class="btn pdf" id="generatePdf">Guardar / Partilhar PDF</button>
           </div>
         </div>
       </section>
@@ -119,6 +121,7 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
     </main>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script type="module" src="src/app.js"></script>
 </body>
 </html>

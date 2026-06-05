@@ -1,8 +1,8 @@
 {
   "name": "inspecoes-rjp",
-  "version": "1.2.0",
+  "version": "1.4.0",
+  "private": true,
   "scripts": {
-    "cap:init": "npx cap init Inspecoes_RJP pt.rjp.inspecoes --web-dir .",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npx cap sync android"
   },
