@@ -1,6 +1,7 @@
 import { stations } from "./data/stations.js";
 import { checklist } from "./data/checklist.js";
-import { printFicha } from "./pdf/printFicha.js";
+import { printFicha, buildPdfBlobForGoogle } from "./pdf/printFicha.js";
+import { saveInspectionToDrive, registerNCStats, syncMaintenanceHub } from "./google/googleSync.js";
 
 const $ = (id) => document.getElementById(id);
 const state = {
@@ -212,6 +213,62 @@ async function handlePhotos(files){
   renderPhotos();
 }
 
+
+async function saveToGoogleDrive(){
+  try{
+    const data = getInspectionData();
+    data.checklist = checklist;
+    const blob = await buildPdfBlobForGoogle(data, checklist);
+    data.pdfBase64 = await blobToBase64(blob);
+    const res = await saveInspectionToDrive(data);
+    if(res.ok){
+      alert("PDF, fotos e estatísticas guardados no Google Drive.");
+    } else {
+      alert("Erro Google Drive: " + (res.message || "sem detalhe"));
+    }
+  } catch(err){
+    alert("Erro ao guardar no Google Drive: " + err.message);
+  }
+}
+
+async function exportNCStats(){
+  try{
+    const data = getInspectionData();
+    data.checklist = checklist;
+    const res = await registerNCStats(data);
+    alert(res.ok ? "Estatísticas NC atualizadas no Google Sheets." : "Erro: " + res.message);
+  } catch(err){
+    alert("Erro ao atualizar estatísticas: " + err.message);
+  }
+}
+
+async function syncHub(){
+  try{
+    const data = getInspectionData();
+    const res = await syncMaintenanceHub({
+      origin: "Inspeções_RJP",
+      station: data.station,
+      type: "Construção Civil",
+      description: data.description,
+      status: data.status,
+      priority: Object.values(data.results || {}).includes("NC") ? "Alta" : "Normal",
+      responsible: data.responsible
+    });
+    alert(res.ok ? "Hub de manutenção sincronizado." : "Erro: " + res.message);
+  } catch(err){
+    alert("Erro na sincronização: " + err.message);
+  }
+}
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result).split(",").pop());
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 function updateStats(){
   const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
   $("totalInspections").textContent = list.length;
@@ -226,6 +283,9 @@ document.querySelectorAll(".nav").forEach(btn => btn.addEventListener("click", (
 $("stationSearch").addEventListener("input", e => renderStationList(stations.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase()))));
 $("saveInspection").addEventListener("click", saveInspection);
 $("generatePdf").addEventListener("click", () => printFicha(getInspectionData(), checklist));
+$("saveDrive").addEventListener("click", saveToGoogleDrive);
+$("exportStats").addEventListener("click", exportNCStats);
+$("syncHub").addEventListener("click", syncHub);
 $("photoInput").addEventListener("change", e => handlePhotos(e.target.files));
 
 $("dateInput").valueAsDate = new Date();

@@ -1,4 +1,4 @@
-const CACHE_NAME = "inspecoes-rjp-v1-4";
+const CACHE_NAME = "inspecoes-rjp-v1-6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,8 @@ const ASSETS = [
   "./src/data/stations.js",
   "./src/data/checklist.js",
   "./src/pdf/printFicha.js",
+  "./src/google/config.js",
+  "./src/google/googleSync.js",
   "./assets/ip-logo.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png"

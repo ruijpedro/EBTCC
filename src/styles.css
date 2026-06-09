@@ -40,3 +40,28 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 @media(max-width:900px){.topbar-logo{height:34px;max-width:145px}.brand-logo{width:130px}}
 
 .pill{display:none!important}
+
+
+.btn.drive{background:#1a73e8;color:white}
+.btn.stats{background:#188038;color:white}
+.btn.sync{background:#5f6368;color:white}
+
+/* IP Corporate override v1.6 */
+:root{
+  --green:#00843D;
+  --green2:#006B32;
+  --light:#F3F5F4;
+  --line:#DADDE0;
+  --red:#C62828;
+  --amber:#F2A900;
+}
+.brand-logo{width:128px;max-height:72px;object-fit:contain;background:white;border-radius:12px;padding:6px}
+.topbar-logo{height:42px;max-width:190px;object-fit:contain}
+.pill{display:none!important}
+.btn.drive{background:#1a73e8;color:white}
+.btn.stats{background:#188038;color:white}
+.btn.sync{background:#5f6368;color:white}
+.card strong{color:#00843D}
+.group-title{background:#EAF5EF;color:#006B32}
+.sidebar{background:linear-gradient(180deg,#00843D,#006B32)!important}
+@media(max-width:900px){.topbar-logo{height:34px;max-width:145px}.brand-logo{width:132px}}

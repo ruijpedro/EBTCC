@@ -1,7 +1,7 @@
 export async function printFicha(data, checklist){
   try {
     if (window.jspdf?.jsPDF) {
-      const blob = await buildPdfBlob(data, checklist);
+      const blob = await buildPdfBlobForGoogle(data, checklist);
       const fileName = `${cleanFileName(data.number || "Inspecao")}_${cleanFileName(data.station || "Estacao")}_${cleanFileName(data.date || new Date().toISOString().slice(0,10))}.pdf`;
       const file = new File([blob], fileName, { type: "application/pdf" });
 
@@ -27,12 +27,11 @@ export async function printFicha(data, checklist){
   } catch (err) {
     console.error(err);
   }
-
   alert("O PDF foi gerado em modo de impressão. Escolhe Guardar como PDF ou Partilhar no menu do dispositivo.");
   window.print();
 }
 
-async function buildPdfBlob(data, checklist){
+export async function buildPdfBlobForGoogle(data, checklist){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = pdf.internal.pageSize.getWidth();
@@ -49,11 +48,12 @@ async function buildPdfBlob(data, checklist){
   pdf.text("FICHA DE INSPEÇÃO", pageW/2, 13, { align: "center" });
   pdf.setFontSize(13);
   pdf.text("Construção Civil", pageW/2, 22, { align: "center" });
-  pdf.setLineWidth(0.6);
-  pdf.line(margin, 30, pageW - margin, 30);
-
-  y = 36;
   pdf.setFontSize(8.5);
+  pdf.text("Infraestruturas de Portugal", pageW/2, 28, { align: "center" });
+  pdf.setLineWidth(0.6);
+  pdf.line(margin, 31, pageW - margin, 31);
+
+  y = 38;
   field(pdf, margin, y, "AM SIGMA:", "543528659");
   field(pdf, 75, y, "Descrição:", data.description || "");
   field(pdf, 150, y, "PKI:", (data.pk || "").split("/")[0] || "");
@@ -82,7 +82,6 @@ async function buildPdfBlob(data, checklist){
     { label:"NA", x:margin+114, w:10 },
     { label:"Observações", x:margin+124, w:pageW-margin-(margin+124) }
   ];
-
   drawHeader(pdf, cols, y);
   y += 7;
 
@@ -160,12 +159,12 @@ async function buildPdfBlob(data, checklist){
     }
     addFooter(pdf, data);
   }
-
   return pdf.output("blob");
 }
 
 function field(pdf, x, y, label, value){
   pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8.5);
   pdf.text(label, x, y);
   pdf.setFont("helvetica", "normal");
   pdf.text(short(value, 52), x + 20, y);

@@ -7,7 +7,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
@@ -16,8 +15,8 @@
       <div class="brand">
         <img class="brand-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <div>
-          <h1>Inspeções_RJP</h1>
-          <p>Linha do Oeste</p>
+          <h1>Infraestruturas de Portugal</h1>
+          <p>Inspeções de Construção Civil · Linha do Oeste</p>
         </div>
       </div>
       <nav>
@@ -40,10 +39,10 @@
 
       <section id="dashboard" class="view active">
         <div class="cards">
-          <article class="card"><small>Estações</small><strong id="totalStations">0</strong><span>Sabugo → Carriço</span></article>
-          <article class="card"><small>Inspeções guardadas</small><strong id="totalInspections">0</strong><span>histórico local</span></article>
+          <article class="card"><small>Edifícios / Estações</small><strong id="totalStations">0</strong><span>Sabugo → Carriço</span></article>
+          <article class="card"><small>Inspeções</small><strong id="totalInspections">0</strong><span>histórico local</span></article>
           <article class="card"><small>NC abertas</small><strong id="totalNC">0</strong><span>não conformidades</span></article>
-          <article class="card"><small>Última estação</small><strong id="lastStation">—</strong><span>última inspeção</span></article>
+          <article class="card"><small>Última intervenção</small><strong id="lastStation">—</strong><span>última inspeção</span></article>
         </div>
         <div class="panel">
           <h3>Estações do troço</h3>
@@ -98,6 +97,9 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           <div class="actions">
             <button class="btn secondary" id="saveInspection">Guardar Inspeção</button>
             <button class="btn pdf" id="generatePdf">Guardar / Partilhar PDF</button>
+            <button class="btn drive" id="saveDrive">Guardar PDF no Drive</button>
+            <button class="btn stats" id="exportStats">Estatísticas NC</button>
+            <button class="btn sync" id="syncHub">Sincronizar Hub</button>
           </div>
         </div>
       </section>
