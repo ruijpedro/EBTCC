@@ -38,11 +38,16 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
-      - name: Force IP Android icon
+      - name: Copy Android Icons
         run: |
-          if [ -d assets/android ]; then
-            cp -r assets/android/mipmap-* android/app/src/main/res/
-          fi
+          mkdir -p android/app/src/main/res
+
+          cp -r assets/android/res/mipmap-mdpi android/app/src/main/res/
+          cp -r assets/android/res/mipmap-hdpi android/app/src/main/res/
+          cp -r assets/android/res/mipmap-xhdpi android/app/src/main/res/
+          cp -r assets/android/res/mipmap-xxhdpi android/app/src/main/res/
+          cp -r assets/android/res/mipmap-xxxhdpi android/app/src/main/res/
+          cp -r assets/android/res/mipmap-anydpi-v26 android/app/src/main/res/
 
       - name: Build Debug APK
         run: |
