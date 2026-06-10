@@ -29,36 +29,30 @@ jobs:
         run: |
           rm -rf www
           mkdir -p www
-
-          cp index.html www/
-          cp manifest.json www/
-          cp service-worker.js www/
-
+          cp index.html manifest.json service-worker.js www/
           cp -r src www/src
-
-          if [ -d assets ]; then
-            cp -r assets www/assets
-          fi
+          cp -r assets www/assets
 
       - name: Add Android platform
         run: |
-          npx cap add android || true
+          rm -rf android
+          npx cap add android
           npx cap sync android
 
       - name: Copy Android Icons
         run: |
           mkdir -p android/app/src/main/res
-
           cp -r assets/android/mipmap-mdpi android/app/src/main/res/
           cp -r assets/android/mipmap-hdpi android/app/src/main/res/
           cp -r assets/android/mipmap-xhdpi android/app/src/main/res/
           cp -r assets/android/mipmap-xxhdpi android/app/src/main/res/
           cp -r assets/android/mipmap-xxxhdpi android/app/src/main/res/
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
 
       - name: Build Debug APK
         run: |
           cd android
-          chmod +x gradlew
+          ls -la
           ./gradlew assembleDebug
 
       - name: Upload APK
