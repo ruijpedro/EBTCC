@@ -1,0 +1,37 @@
+name: Build WebApp
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-webapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare WebApp
+        run: |
+          rm -rf webapp
+          mkdir webapp
+          cp index.html manifest.json service-worker.js webapp/
+          cp -r src webapp/src
+          cp -r assets webapp/assets
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: webapp
+
+  deploy-webapp:
+    needs: build-webapp
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
