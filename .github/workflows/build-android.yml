@@ -6,57 +6,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Prepare web folder
-        run: |
-          rm -rf www
-          mkdir -p www
-          cp index.html manifest.json service-worker.js www/
-          cp -r src www/src
-          cp -r assets www/assets
-
-      - name: Add Android platform
-        run: |
-          rm -rf android
-          npx cap add android
-          npx cap sync android
-
-      - name: Copy Android Icons
-        run: |
-          mkdir -p android/app/src/main/res
-          cp -r assets/android/mipmap-mdpi android/app/src/main/res/
-          cp -r assets/android/mipmap-hdpi android/app/src/main/res/
-          cp -r assets/android/mipmap-xhdpi android/app/src/main/res/
-          cp -r assets/android/mipmap-xxhdpi android/app/src/main/res/
-          cp -r assets/android/mipmap-xxxhdpi android/app/src/main/res/
-          rm -rf android/app/src/main/res/mipmap-anydpi-v26
-
-      - name: Build Debug APK
+      - name: Build APK
         run: |
           cd android
-          ls -la
+          chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: EBTCC_APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/*.apk
