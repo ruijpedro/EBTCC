@@ -1,23 +1,12 @@
 import { GOOGLE_CONFIG, setAppsScriptUrl } from "./config.js";
 
-export function googleConfigured(){
-  return Boolean(localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL);
-}
-
-export function saveAppsScriptUrl(url){
-  setAppsScriptUrl(url);
-}
-
-function getScriptUrl(){
-  return localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL;
-}
+export function googleConfigured(){ return Boolean(localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL); }
+export function saveAppsScriptUrl(url){ setAppsScriptUrl(url); }
+function getScriptUrl(){ return localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL; }
 
 export async function sendToGoogle(action, payload){
   const url = getScriptUrl();
-  if(!url){
-    alert("Falta configurar o URL do Apps Script em Google/Drive.");
-    return { ok:false, message:"URL Apps Script não configurado" };
-  }
+  if(!url) return { ok:false, message:"URL Apps Script não configurado" };
   const response = await fetch(url, {
     method: "POST",
     mode: "cors",

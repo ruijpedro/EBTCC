@@ -33,10 +33,7 @@ function doPost(e) {
 function prepareDrive(root) {
   const ebtcc = getOrCreateFolder(root, "EBTCC");
   ["Inspeções","PDFs","Fotografias","NC","Relatórios","Hub","AMV","EDF_Oeste","FenceRail_RJP"].forEach(n => getOrCreateFolder(ebtcc, n));
-  const ss = getMasterSheet();
-  getOrCreateSheet(ss, "Inspecoes");
-  getOrCreateSheet(ss, "Nao_Conformidades");
-  getOrCreateSheet(ss, "Hub_Manutencao");
+  getMasterSheet();
   return { ok:true, message:"Estrutura criada/confirmada." };
 }
 
@@ -52,8 +49,7 @@ function fullSync(root, payload) {
 function loadCloud() {
   const ss = getMasterSheet();
   const sh = getOrCreateSheet(ss, "Inspecoes");
-  const values = sh.getDataRange().getValues();
-  return { ok:true, rows: values };
+  return { ok:true, rows: sh.getDataRange().getValues() };
 }
 
 function saveInspection(root, data) {

@@ -1,20 +1,49 @@
 import { stations } from "./data/stations.js";
 import { checklist } from "./data/checklist.js";
 import { printFicha, buildPdfBlobForGoogle } from "./pdf/printFicha.js";
-import { saveInspectionToDrive, registerNCStats, fullSync, googleConfigured, saveAppsScriptUrl, testConnection, prepareDrive, loadCloud, exportCalendar } from "./google/googleSync.js";
+import {
+  saveAppsScriptUrl,
+  testConnection,
+  prepareDrive,
+  saveInspectionToDrive,
+  registerNCStats,
+  fullSync,
+  loadCloud,
+  exportCalendar,
+  googleConfigured
+} from "./google/googleSync.js";
 
 const $ = (id) => document.getElementById(id);
+
 const state = {
-  results: JSON.parse(localStorage.getItem("inspecoes_rjp_results") || "{}"),
+  results: JSON.parse(localStorage.getItem("ebtcc_results") || "{}"),
   photos: []
 };
 
 function setView(name){
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.querySelectorAll(".nav").forEach(v => v.classList.remove("active"));
-  $(name).classList.add("active");
+  $(name)?.classList.add("active");
   document.querySelector(`[data-view="${name}"]`)?.classList.add("active");
-  $("viewTitle").textContent = {dashboard:"Dashboard",stations:"Estações",inspection:"Nova Inspeção",reports:"Relatórios",map:"Mapa Linha",sync:"Sincronizar",googleDrive:"Google Drive / Apps Script"}[name] || "Inspeções_RJP";
+  const titles = {
+    dashboard:"Dashboard",
+    stations:"Estações",
+    inspection:"Nova Inspeção",
+    reports:"Relatórios",
+    map:"Mapa Linha",
+    googleDrive:"Google Drive / Apps Script"
+  };
+  if($("viewTitle")) $("viewTitle").textContent = titles[name] || "EBTCC";
+}
+
+function updateSyncUi(message){
+  const now = new Date().toLocaleString("pt-PT");
+  const status = message || (googleConfigured() ? "Online" : "Por configurar");
+  ["syncStatus","syncStatusTop"].forEach(id => { if($(id)) $(id).textContent = status; });
+  if($("lastSync")) $("lastSync").textContent = now;
+  if($("lastSyncSmall")) $("lastSyncSmall").textContent = now;
+  if($("googleState")) $("googleState").textContent = googleConfigured() ? "Configurado" : "Por configurar";
+  localStorage.setItem("ebtcc_last_sync", now);
 }
 
 function initStations(){
@@ -22,16 +51,23 @@ function initStations(){
   $("stationChips").innerHTML = stations.map(s => `<span class="chip">${s}</span>`).join("");
   $("stationSelect").innerHTML = stations.map(s => `<option>${s}</option>`).join("");
   renderStationList(stations);
+  renderMap();
 }
 
 function stationStatus(station){
-  const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]").filter(r => r.station === station);
+  const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]").filter(r => r.station === station);
   const last = list[0];
   if(!last) return {label:"Sem inspeção", cls:""};
   const nc = Object.values(last.results || {}).filter(v => v === "NC").length;
   if(nc >= 3) return {label:`${nc} NC abertas`, cls:"bad"};
   if(nc > 0) return {label:`${nc} NC`, cls:"warn"};
   return {label:"OK", cls:""};
+}
+
+function openInspectionForStation(station){
+  $("stationSelect").value = station;
+  $("descriptionInput").value = `LO_MPS_BT_CC_${station} (S)`;
+  setView("inspection");
 }
 
 function renderStationList(list){
@@ -43,33 +79,23 @@ function renderStationList(list){
     </div>`;
   }).join("");
   document.querySelectorAll(".station-row").forEach(row => {
-    row.addEventListener("click", () => {
-      $("stationSelect").value = row.dataset.station;
-      $("descriptionInput").value = `LO_MPS_BT_CC_${row.dataset.station} (S)`;
-      setView("inspection");
-    });
+    row.addEventListener("click", () => openInspectionForStation(row.dataset.station));
   });
 }
-
 
 function renderMap(){
   const el = $("lineMap");
   if(!el) return;
   el.innerHTML = stations.map((s, i) => {
     const st = stationStatus(s);
-    const num = String(i + 1).padStart(2, "0");
     return `<div class="map-row" data-map-station="${s}">
-      <span class="map-node ${st.cls}">${num}</span>
+      <span class="map-node ${st.cls}">${String(i+1).padStart(2,"0")}</span>
       <span><span class="map-name">${s}</span><br><span class="map-meta">Linha do Oeste · Sabugo → Carriço</span></span>
       <span class="map-badge">${st.label}</span>
     </div>`;
   }).join("");
   document.querySelectorAll("[data-map-station]").forEach(row => {
-    row.addEventListener("click", () => {
-      $("stationSelect").value = row.dataset.mapStation;
-      $("descriptionInput").value = `LO_MPS_BT_CC_${row.dataset.mapStation} (S)`;
-      setView("inspection");
-    });
+    row.addEventListener("click", () => openInspectionForStation(row.dataset.mapStation));
   });
 }
 
@@ -96,16 +122,16 @@ function initChecklist(){
       box.querySelectorAll("button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       state.results[box.dataset.code] = btn.dataset.value;
+      localStorage.setItem("ebtcc_results", JSON.stringify(state.results));
       updateStats();
-setSyncUi(googleConfigured() ? "Online" : "Por configurar");
     });
   });
 }
 
 function nextInspectionNumber(){
-  const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
+  const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
   const year = new Date().getFullYear();
-  return `CC-${year}-${String(list.length + 1).padStart(5,"0")}`;
+  return `EBTCC-${year}-${String(list.length + 1).padStart(5,"0")}`;
 }
 
 function getInspectionData(){
@@ -124,16 +150,17 @@ function getInspectionData(){
     status: $("statusInput").value,
     responsible: $("responsibleInput").value,
     results: state.results,
-    photos: state.photos
+    photos: state.photos,
+    checklist
   };
 }
 
 function saveInspection(){
   const data = getInspectionData();
-  const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
+  const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
   list.unshift({ ...data, savedAt: new Date().toISOString() });
-  localStorage.setItem("inspecoes_rjp_saved", JSON.stringify(list));
-  localStorage.setItem("inspecoes_rjp_results", JSON.stringify(state.results));
+  localStorage.setItem("ebtcc_saved", JSON.stringify(list));
+  localStorage.setItem("ebtcc_results", JSON.stringify(state.results));
   state.photos = [];
   renderPhotos();
   $("inspectionNumberInput").value = nextInspectionNumber();
@@ -145,18 +172,18 @@ function saveInspection(){
 }
 
 function renderReports(){
-  const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
+  const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
   $("reportsList").innerHTML = list.length ? list.map((r,i) => {
     const nc = Object.values(r.results || {}).filter(v => v === "NC").length;
     return `<div class="station-row">
-      <span><strong>${r.number || "CC"} — ${r.station}</strong><br><small>${new Date(r.savedAt).toLocaleString("pt-PT")} · ${nc} NC · ${r.photos?.length || 0} fotos</small></span>
-      <button class="btn secondary" data-report="${i}">Gerar PDF</button>
+      <span><strong>${r.number || "EBTCC"} — ${r.station}</strong><br><small>${new Date(r.savedAt).toLocaleString("pt-PT")} · ${nc} NC · ${r.photos?.length || 0} fotos</small></span>
+      <button class="btn secondary" data-report="${i}">Gerar / Partilhar PDF</button>
     </div>`;
   }).join("") : "<p>Ainda não existem relatórios guardados.</p>";
   document.querySelectorAll("[data-report]").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.report);
-      const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
+      const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
       printFicha(list[idx], checklist);
     });
   });
@@ -196,7 +223,7 @@ function compressImage(file){
         canvas.width = Math.round(width);
         canvas.height = Math.round(height);
         canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.72));
+        resolve(canvas.toDataURL("image/jpeg", 0.76));
       };
       img.onerror = reject;
       img.src = reader.result;
@@ -214,185 +241,43 @@ async function handlePhotos(files){
   renderPhotos();
 }
 
-
 async function saveToGoogleDrive(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const blob = await buildPdfBlobForGoogle(data, checklist);
-    data.pdfBase64 = await blobToBase64(blob);
-    const res = await saveInspectionToDrive(data);
-    if(res.ok){
-      alert("PDF, fotos e estatísticas guardados no Google Drive.");
-    } else {
-      alert("Erro Google Drive: " + (res.message || "sem detalhe"));
-    }
-  } catch(err){
-    alert("Erro ao guardar no Google Drive: " + err.message);
-  }
+  const data = getInspectionData();
+  const blob = await buildPdfBlobForGoogle(data, checklist);
+  data.pdfBase64 = await blobToBase64(blob);
+  const res = await saveInspectionToDrive(data);
+  updateSyncUi(res.ok ? "Sincronizado" : "Erro");
+  alert(res.ok ? "PDF, fotos e estatísticas guardados no Google Drive." : "Erro Google Drive: " + (res.message || "sem detalhe"));
 }
 
 async function exportNCStats(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const res = await registerNCStats(data);
-    alert(res.ok ? "Estatísticas NC atualizadas no Google Sheets." : "Erro: " + res.message);
-  } catch(err){
-    alert("Erro ao atualizar estatísticas: " + err.message);
-  }
-}
-
-async function syncHub(){
-  try{
-    const data = getInspectionData();
-    const res = await syncMaintenanceHub({
-      origin: "Inspeções_RJP",
-      station: data.station,
-      type: "Construção Civil",
-      description: data.description,
-      status: data.status,
-      priority: Object.values(data.results || {}).includes("NC") ? "Alta" : "Normal",
-      responsible: data.responsible
-    });
-    alert(res.ok ? "Hub de manutenção sincronizado." : "Erro: " + res.message);
-  } catch(err){
-    alert("Erro na sincronização: " + err.message);
-  }
-}
-
-function blobToBase64(blob){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(String(reader.result).split(",").pop());
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-
-function setSyncUi(message){
-  const now = new Date().toLocaleString("pt-PT");
-  document.querySelectorAll("#syncStatus").forEach(el => el.textContent = message);
-  document.querySelectorAll("#googleState").forEach(el => el.textContent = googleConfigured() ? "Configurado" : "Por configurar");
-  document.querySelectorAll("#lastSync").forEach(el => el.textContent = now);
-  localStorage.setItem("ebtcc_last_sync", now);
-}
-
-async function saveToGoogleDrive(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const blob = await buildPdfBlobForGoogle(data, checklist);
-    data.pdfBase64 = await blobToBase64(blob);
-    const res = await saveInspectionToDrive(data);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "PDF, fotos e estatísticas guardados no Google Drive." : "Erro Google Drive: " + (res.message || "sem detalhe"));
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro ao guardar no Google Drive: " + err.message);
-  }
-}
-
-async function exportNCStats(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const res = await registerNCStats(data);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "Estatísticas NC atualizadas no Google Sheets." : "Erro: " + res.message);
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro ao atualizar estatísticas: " + err.message);
-  }
+  const data = getInspectionData();
+  const res = await registerNCStats(data);
+  updateSyncUi(res.ok ? "Sincronizado" : "Erro");
+  alert(res.ok ? "Estatísticas NC atualizadas." : "Erro: " + res.message);
 }
 
 async function syncAll(){
-  try{
-    const payload = {
-      inspections: JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]"),
-      current: getInspectionData(),
-      lastSync: localStorage.getItem("ebtcc_last_sync") || ""
-    };
-    payload.current.checklist = checklist;
-    const res = await fullSync(payload);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "Sincronização concluída." : "Erro de sincronização: " + (res.message || "sem detalhe"));
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro na sincronização: " + err.message);
-  }
+  const payload = {
+    inspections: JSON.parse(localStorage.getItem("ebtcc_saved") || "[]"),
+    current: getInspectionData(),
+    lastSync: localStorage.getItem("ebtcc_last_sync") || ""
+  };
+  const res = await fullSync(payload);
+  updateSyncUi(res.ok ? "Sincronizado" : "Erro");
+  alert(res.ok ? "Sincronização concluída." : "Erro: " + (res.message || "sem detalhe"));
 }
 
-function blobToBase64(blob){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(String(reader.result).split(",").pop());
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+async function loadFromCloud(){
+  const res = await loadCloud();
+  updateSyncUi(res.ok ? "Sincronizado" : "Erro");
+  alert(res.ok ? "Dados carregados da Cloud." : "Erro: " + (res.message || "sem detalhe"));
 }
 
-
-function initGooglePage(){
-  const input = $("appsScriptUrlInput");
-  if(input) input.value = localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || "";
-  const last = localStorage.getItem("ebtcc_last_sync") || "—";
-  document.querySelectorAll("#lastSync").forEach(el => el.textContent = last);
-  document.querySelectorAll("#googleState").forEach(el => el.textContent = googleConfigured() ? "Configurado" : "Por configurar");
-}
-
-function setSyncUi(message){
-  const now = new Date().toLocaleString("pt-PT");
-  document.querySelectorAll("#syncStatus").forEach(el => el.textContent = message);
-  document.querySelectorAll("#googleState").forEach(el => el.textContent = googleConfigured() ? "Configurado" : "Por configurar");
-  document.querySelectorAll("#lastSync").forEach(el => el.textContent = now);
-  localStorage.setItem("ebtcc_last_sync", now);
-}
-
-async function saveToGoogleDrive(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const blob = await buildPdfBlobForGoogle(data, checklist);
-    data.pdfBase64 = await blobToBase64(blob);
-    const res = await saveInspectionToDrive(data);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "PDF, fotos e estatísticas guardados no Google Drive." : "Erro Google Drive: " + (res.message || "sem detalhe"));
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro ao guardar no Google Drive: " + err.message);
-  }
-}
-
-async function exportNCStats(){
-  try{
-    const data = getInspectionData();
-    data.checklist = checklist;
-    const res = await registerNCStats(data);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "Estatísticas NC atualizadas no Google Sheets." : "Erro: " + res.message);
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro ao atualizar estatísticas: " + err.message);
-  }
-}
-
-async function syncAll(){
-  try{
-    const payload = {
-      inspections: JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]"),
-      current: getInspectionData(),
-      lastSync: localStorage.getItem("ebtcc_last_sync") || ""
-    };
-    payload.current.checklist = checklist;
-    const res = await fullSync(payload);
-    setSyncUi(res.ok ? "Sincronizado" : "Erro");
-    alert(res.ok ? "Sincronização concluída." : "Erro de sincronização: " + (res.message || "sem detalhe"));
-  } catch(err){
-    setSyncUi("Erro");
-    alert("Erro na sincronização: " + err.message);
-  }
+async function exportToCalendar(){
+  const res = await exportCalendar(getInspectionData());
+  updateSyncUi(res.ok ? "Sincronizado" : "Erro");
+  alert(res.ok ? "Calendar atualizado." : "Erro: " + (res.message || "sem detalhe"));
 }
 
 function blobToBase64(blob){
@@ -405,59 +290,60 @@ function blobToBase64(blob){
 }
 
 function updateStats(){
-  const list = JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]");
+  const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
   $("totalInspections").textContent = list.length;
   const ncTotal = list.reduce((acc, r) => acc + Object.values(r.results || {}).filter(v => v === "NC").length, 0);
   $("totalNC").textContent = ncTotal;
   $("lastStation").textContent = list[0]?.station || "—";
 }
 
+function initGooglePage(){
+  if($("appsScriptUrlInput")) $("appsScriptUrlInput").value = localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || "";
+  updateSyncUi(googleConfigured() ? "Online" : "Por configurar");
+}
+
 function escapeAttr(value){ return String(value || "").replace(/"/g, "&quot;"); }
 
-document.querySelectorAll(".nav").forEach(btn => btn.addEventListener("click", () => setView(btn.dataset.view)));
-$("stationSearch").addEventListener("input", e => renderStationList(stations.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase()))));
-$("saveInspection").addEventListener("click", saveInspection);
-$("generatePdf").addEventListener("click", () => printFicha(getInspectionData(), checklist));
+function bindEvents(){
+  document.querySelectorAll(".nav").forEach(btn => btn.addEventListener("click", () => setView(btn.dataset.view)));
+  $("menuBtn")?.addEventListener("click", () => document.querySelector(".sidebar")?.classList.toggle("open"));
+  $("stationSearch")?.addEventListener("input", e => renderStationList(stations.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase()))));
+  $("saveInspection")?.addEventListener("click", saveInspection);
+  $("generatePdf")?.addEventListener("click", () => printFicha(getInspectionData(), checklist));
+  $("photoInput")?.addEventListener("change", e => handlePhotos(e.target.files));
 
-$("saveAppsScriptUrl")?.addEventListener("click", () => {
-  saveAppsScriptUrl($("appsScriptUrlInput").value.trim());
-  initGooglePage();
-  alert("Ligação Google guardada.");
-});
-$("testGoogleConnection")?.addEventListener("click", async () => {
-  const res = await testConnection();
-  alert(res.ok ? "Ligação ativa." : "Erro: " + res.message);
-});
-$("prepareDrive")?.addEventListener("click", async () => {
-  const res = await prepareDrive();
-  alert(res.ok ? "Drive/Sheets preparado." : "Erro: " + res.message);
-});
-$("syncDriveBtn")?.addEventListener("click", syncAll);
-$("saveAllCloud")?.addEventListener("click", saveToGoogleDrive);
-$("loadCloud")?.addEventListener("click", async () => {
-  const res = await loadCloud();
-  alert(res.ok ? "Dados carregados da Cloud." : "Erro: " + res.message);
-});
-$("syncAllCloud")?.addEventListener("click", syncAll);
-$("exportCalendar")?.addEventListener("click", async () => {
-  const res = await exportCalendar(getInspectionData());
-  alert(res.ok ? "Calendar atualizado." : "Erro: " + res.message);
-});
-$("saveDrive")?.addEventListener("click", saveToGoogleDrive);
-$("exportStats")?.addEventListener("click", exportNCStats);
-$("syncNow")?.addEventListener("click", syncAll);
+  $("saveDrive")?.addEventListener("click", () => saveToGoogleDrive().catch(e => alert(e.message)));
+  $("exportStats")?.addEventListener("click", () => exportNCStats().catch(e => alert(e.message)));
+  $("syncNow")?.addEventListener("click", () => syncAll().catch(e => alert(e.message)));
+  $("sideSyncBtn")?.addEventListener("click", () => syncAll().catch(e => alert(e.message)));
 
-$("saveDrive").addEventListener("click", saveToGoogleDrive);
-$("exportStats").addEventListener("click", exportNCStats);
-$("syncHub").addEventListener("click", syncHub);
-$("photoInput").addEventListener("change", e => handlePhotos(e.target.files));
+  $("saveAppsScriptUrl")?.addEventListener("click", () => {
+    saveAppsScriptUrl($("appsScriptUrlInput").value.trim());
+    initGooglePage();
+    alert("Ligação Google guardada.");
+  });
+  $("testGoogleConnection")?.addEventListener("click", async () => {
+    const res = await testConnection();
+    alert(res.ok ? "Ligação ativa." : "Erro: " + res.message);
+  });
+  $("prepareDrive")?.addEventListener("click", async () => {
+    const res = await prepareDrive();
+    alert(res.ok ? "Drive/Sheets preparado." : "Erro: " + res.message);
+  });
+  $("syncDriveBtn")?.addEventListener("click", () => syncAll().catch(e => alert(e.message)));
+  $("saveAllCloud")?.addEventListener("click", () => saveToGoogleDrive().catch(e => alert(e.message)));
+  $("loadCloud")?.addEventListener("click", () => loadFromCloud().catch(e => alert(e.message)));
+  $("syncAllCloud")?.addEventListener("click", () => syncAll().catch(e => alert(e.message)));
+  $("exportCalendar")?.addEventListener("click", () => exportToCalendar().catch(e => alert(e.message)));
+}
 
 $("dateInput").valueAsDate = new Date();
 $("inspectionNumberInput").value = nextInspectionNumber();
 initStations();
 initChecklist();
 renderReports();
-renderMap();
 updateStats();
+initGooglePage();
+bindEvents();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
