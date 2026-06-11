@@ -31,7 +31,7 @@ jobs:
           mkdir -p www
           cp index.html manifest.json service-worker.js www/
           cp -r src www/src
-          if [ -d assets ]; then cp -r assets www/assets; fi
+          cp -r assets www/assets
 
       - name: Add Android platform
         run: |
@@ -39,14 +39,10 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Force IP Android Icons
+      - name: Force EBTCC Android Icon
         run: |
           mkdir -p android/app/src/main/res
-          if [ -d assets/android/res ]; then
-            cp -r assets/android/res/mipmap-* android/app/src/main/res/
-          else
-            cp -r assets/android/mipmap-* android/app/src/main/res/
-          fi
+          cp -r assets/android/res/mipmap-* android/app/src/main/res/
 
       - name: Build Debug APK
         run: |
