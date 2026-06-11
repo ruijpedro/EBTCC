@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Inspeções_RJP</title>
+  <title>EBTCC</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
@@ -26,9 +26,9 @@
         <button class="nav" data-view="reports">Relatórios</button>
         <button class="nav" data-view="map">Mapa Linha</button>
         <button class="nav" data-view="googleDrive">Google/Drive</button>
-        <button class="nav" data-view="sync">☁️ Sincronizar</button>
       </nav>
-      <div class="sync">Offline pronto<br><small>Dados guardados neste dispositivo</small></div>
+      <button class="big-sync" id="sideSyncBtn">☁️ Sincronizar</button>
+      <div class="sync">Estado: <span id="syncStatus">Offline</span><br><small>Última sync: <span id="lastSyncSmall">—</span></small></div>
     </aside>
 
     <main>
@@ -36,7 +36,7 @@
         <img class="topbar-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <button id="menuBtn">☰</button>
         <h2 id="viewTitle">Dashboard</h2>
-        
+        <span id="syncStatusTop" class="sync-status">Offline</span>
       </header>
 
       <section id="dashboard" class="view active">
@@ -69,7 +69,7 @@
           </div>
           <div class="form-grid">
             <label>Descrição<input id="descriptionInput" value="LO_MPS_BT_CC_Caldas Rainha (S)"></label>
-            <label>Subdescrição<input id="subDescriptionInput" value="Edifício Passageiros CALDAS DA RAINHA 105-011, 105-011"></label>
+            <label>Subdescrição<input id="subDescriptionInput" value="Edifício Passageiros CALDAS DA RAINHA"></label>
             <label>Segmento<input id="segmentInput" value="00231"></label>
             <label>PKI / PKF<input id="pkInput" value="17:840 / 215:227"></label>
           </div>
@@ -82,14 +82,13 @@
 
         <div class="panel">
           <h3>Fotografias</h3>
-          <p class="hint">As fotografias ficam guardadas localmente e seguem no PDF.</p>
+          <p class="hint">As fotografias ficam guardadas localmente, seguem no PDF e podem ser enviadas para o Drive.</p>
           <input id="photoInput" type="file" accept="image/*" capture="environment" multiple>
           <div id="photoGrid" class="photo-grid"></div>
         </div>
 
         <div class="panel">
-          <label>Observações<textarea id="observationsInput">As caleiras de drenagem dos abrigos das plataformas apresenta elevada grau de degradação encontrando-se rotas em vários sítios.
-Devem ser substituídas com a maior celeridade possível, pelo que se propõem a realização de uma MPC.</textarea></label>
+          <label>Observações<textarea id="observationsInput">As caleiras de drenagem dos abrigos das plataformas apresentam elevado grau de degradação.</textarea></label>
           <div class="form-grid">
             <label>Executou<input id="executedByInput"></label>
             <label>Status<input id="statusInput" value="Aprovada"></label>
@@ -98,10 +97,10 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           </div>
           <div class="actions">
             <button class="btn secondary" id="saveInspection">Guardar Inspeção</button>
-            <button class="btn pdf" id="generatePdf">Guardar / Partilhar PDF</button>
+            <button class="btn pdf" id="generatePdf">Gerar / Partilhar PDF</button>
             <button class="btn drive" id="saveDrive">Guardar PDF no Drive</button>
             <button class="btn stats" id="exportStats">Estatísticas NC</button>
-            <button class="btn sync" id="syncHub">Sincronizar Hub</button>
+            <button class="btn sync" id="syncNow">☁️ Sincronizar</button>
           </div>
         </div>
       </section>
@@ -112,7 +111,6 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           <div id="reportsList"></div>
         </div>
       </section>
-    
 
       <section id="map" class="view">
         <div class="panel">
@@ -122,24 +120,6 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
         </div>
       </section>
 
-    
-      <section id="sync" class="view">
-        <div class="panel">
-          <h3>Sincronização Google</h3>
-          <p class="hint">Sincronização tipo RJP Study: APK ↔ Google Drive/Sheets ↔ WebApp.</p>
-          <div class="sync-panel">
-            <div><strong>Estado:</strong> <span id="googleState">Por configurar</span></div>
-            <div><strong>Última sincronização:</strong> <span id="lastSync">—</span></div>
-          </div>
-          <div class="actions">
-            <button class="btn sync" id="syncNow2">☁️ Sincronizar agora</button>
-            <button class="btn drive" id="saveDrive2">Guardar inspeção no Drive</button>
-            <button class="btn stats" id="exportStats2">Atualizar estatísticas NC</button>
-          </div>
-        </div>
-      </section>
-
-    
       <section id="googleDrive" class="view">
         <div class="panel google-page">
           <h3>Google Drive / Apps Script</h3>
@@ -183,11 +163,10 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           </div>
         </div>
       </section>
-
     </main>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script type="module" src="src/app.js"></script>
+  <script type="module" src="src/app.js?v=2.2"></script>
 </body>
 </html>

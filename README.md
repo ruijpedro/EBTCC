@@ -1,10 +1,15 @@
-# EBTCC v2.1 — Google/Drive como RJP Study
+# EBTCC v2.2 — Correção botões, WebApp=APK e ícone
 
-## Novidades
+## O que foi corrigido
 
-- Página `Google/Drive` igual à filosofia da RJP Study.
-- Campo para colar e guardar o URL do Apps Script.
+- `app.js` refeito para garantir que todos os botões funcionam.
+- WebApp e APK usam exatamente o mesmo `index.html`, `src` e `assets`.
+- Service worker com cache nova `ebtcc-v2-2`.
+- Ícone Android reconstruído com símbolo IP grande.
+- Removido `mipmap-anydpi-v26` no build para evitar adaptive icon genérico.
+- Página Google/Drive como na RJP Study.
 - Botões:
+  - Guardar ligação
   - Testar ligação
   - Preparar Drive/Sheets
   - Sincronizar Drive
@@ -12,22 +17,15 @@
   - Carregar da Cloud
   - Sincronizar tudo
   - Exportar Calendar
-- Botão Sincronizar na APK e WebApp.
-- Google Drive na pasta EBTCC.
-- Google Sheets `EBTCC_MASTER`.
-- PDF com fotos, guardar no Drive, enviar/partilhar por WhatsApp ou Email.
-- Nome da app: EBTCC.
-- Ícone Android/PWA reconstruído para evitar ícone genérico.
+  - Guardar PDF no Drive
+  - Gerar/partilhar PDF
 
-## Pasta Drive
+## Depois de atualizar
 
-`12BvkIaHTFVpiNZ8S4GBrozTzipgZIEfm`
-
-## Configuração
-
-1. Criar Apps Script.
-2. Colar `google-apps-script/Code.gs`.
-3. Implementar como Aplicação Web.
-4. Copiar URL.
-5. Abrir EBTCC → Google/Drive.
-6. Colar URL e clicar `Guardar ligação`.
+1. No GitHub, substitui tudo por este ZIP.
+2. Corre o workflow `Build WebApp`.
+3. Corre o workflow `Build Android APK`.
+4. No telemóvel, desinstala a APK antiga.
+5. Reinicia o telemóvel.
+6. Instala a nova APK.
+7. Na WebApp, faz Ctrl+F5 para limpar cache.
