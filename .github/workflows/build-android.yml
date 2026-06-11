@@ -43,6 +43,7 @@ jobs:
         run: |
           mkdir -p android/app/src/main/res
           cp -r assets/android/res/mipmap-* android/app/src/main/res/
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
 
       - name: Build Debug APK
         run: |
