@@ -1,11 +1,29 @@
-# EBTCC / Inspeções_RJP — IP Icon Fix v1.6.1
+# EBTCC v2 — IP + Google Sync
 
-Correção do ícone Android usando o pacote `ic_launcher` enviado.
+Versão preparada para APK e WebApp, com sincronização tipo RJP Study.
 
-Atualizar no GitHub com todos os ficheiros deste ZIP.
+## Inclui
 
-Depois:
-1. Actions → Build Android APK → Run workflow.
-2. Desinstalar a app antiga do telemóvel.
-3. Reiniciar o telemóvel.
-4. Instalar a nova APK.
+- Nome da app: EBTCC.
+- Ícone Android/PWA com pacote `ic_launcher` enviado.
+- Botão ☁️ Sincronizar.
+- Botão Gerar / Partilhar PDF.
+- Botão Guardar PDF no Drive.
+- Botão Estatísticas NC.
+- PDF com fotografias.
+- Google Drive: pasta EBTCC.
+- Google Sheets: EBTCC_MASTER.
+- Intercâmbio futuro com EDF_Oeste, AMV, FenceRail_RJP e outras apps.
+
+## Google Drive
+
+Pasta EBTCC:
+`12BvkIaHTFVpiNZ8S4GBrozTzipgZIEfm`
+
+## Apps Script
+
+Código em:
+`google-apps-script/Code.gs`
+
+Depois de implementar a Web App no Google Apps Script, cola o URL em:
+`src/google/config.js`

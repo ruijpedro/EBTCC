@@ -15,8 +15,8 @@
       <div class="brand">
         <img class="brand-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <div>
-          <h1>Infraestruturas de Portugal</h1>
-          <p>Inspeções de Construção Civil · Linha do Oeste</p>
+          <h1>EBTCC</h1>
+          <p>Infraestruturas de Portugal · Linha do Oeste</p>
         </div>
       </div>
       <nav>
@@ -25,6 +25,7 @@
         <button class="nav" data-view="inspection">Nova Inspeção</button>
         <button class="nav" data-view="reports">Relatórios</button>
         <button class="nav" data-view="map">Mapa Linha</button>
+        <button class="nav" data-view="sync">☁️ Sincronizar</button>
       </nav>
       <div class="sync">Offline pronto<br><small>Dados guardados neste dispositivo</small></div>
     </aside>
@@ -117,6 +118,23 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
           <h3>Mapa esquemático — Linha do Oeste</h3>
           <p class="hint">Troço operacional Sabugo → Carriço. Toca numa estação para abrir nova inspeção.</p>
           <div id="lineMap" class="line-map"></div>
+        </div>
+      </section>
+
+    
+      <section id="sync" class="view">
+        <div class="panel">
+          <h3>Sincronização Google</h3>
+          <p class="hint">Sincronização tipo RJP Study: APK ↔ Google Drive/Sheets ↔ WebApp.</p>
+          <div class="sync-panel">
+            <div><strong>Estado:</strong> <span id="googleState">Por configurar</span></div>
+            <div><strong>Última sincronização:</strong> <span id="lastSync">—</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn sync" id="syncNow2">☁️ Sincronizar agora</button>
+            <button class="btn drive" id="saveDrive2">Guardar inspeção no Drive</button>
+            <button class="btn stats" id="exportStats2">Atualizar estatísticas NC</button>
+          </div>
         </div>
       </section>
 

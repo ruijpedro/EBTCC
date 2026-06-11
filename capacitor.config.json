@@ -1,6 +1,6 @@
 {
-  "appId": "pt.rjp.inspecoes",
-  "appName": "Inspecoes_RJP",
+  "appId": "pt.rjp.ebtcc",
+  "appName": "EBTCC",
   "webDir": "www",
   "server": {
     "androidScheme": "https"

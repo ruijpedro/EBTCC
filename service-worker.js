@@ -1,4 +1,4 @@
-const CACHE_NAME = "inspecoes-rjp-v1-6";
+const CACHE_NAME = "ebtcc-v2";
 const ASSETS = [
   "./",
   "./index.html",

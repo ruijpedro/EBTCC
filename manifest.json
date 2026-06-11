@@ -1,7 +1,7 @@
 {
-  "name": "Inspeções_RJP - Infraestruturas de Portugal",
-  "short_name": "Inspeções",
-  "description": "Sistema de Inspeção e Manutenção Ferroviária da Linha do Oeste",
+  "name": "EBTCC",
+  "short_name": "EBTCC",
+  "description": "Sistema de inspeção e manutenção ferroviária da Linha do Oeste",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
