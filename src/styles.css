@@ -86,3 +86,17 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 .card strong{color:#008752}
 .group-title{background:#EAF5EF;color:#006B32}
 @media(max-width:900px){.sync-panel{grid-template-columns:1fr}.topbar-logo{height:34px;max-width:145px}.brand-logo{width:132px}}
+
+/* Google page like RJP Study */
+.google-url-row{display:grid;grid-template-columns:1fr minmax(220px,360px);gap:14px;margin-bottom:18px}
+.google-cards{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:14px}
+.google-card{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;min-height:180px;box-shadow:0 8px 22px rgba(0,0,0,.05)}
+.google-card h4{margin:0 0 12px;font-size:18px}
+.google-card p{font-size:14px;color:#26352d;min-height:58px}
+.google-card .btn{display:block;margin:8px 0;width:max-content}
+.sync-status{margin-left:auto;background:#e7f1eb;color:#006B32;padding:8px 12px;border-radius:999px;font-weight:700}
+.btn.drive{background:#1a73e8;color:white}
+.btn.stats{background:#188038;color:white}
+.btn.sync{background:#13b981;color:white}
+@media(max-width:1200px){.google-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.google-url-row,.google-cards{grid-template-columns:1fr}}

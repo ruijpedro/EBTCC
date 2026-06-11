@@ -16,7 +16,7 @@
         <img class="brand-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <div>
           <h1>EBTCC</h1>
-          <p>Infraestruturas de Portugal · Linha do Oeste</p>
+          <p>IP · Manutenção Ferroviária · Linha do Oeste</p>
         </div>
       </div>
       <nav>
@@ -25,6 +25,7 @@
         <button class="nav" data-view="inspection">Nova Inspeção</button>
         <button class="nav" data-view="reports">Relatórios</button>
         <button class="nav" data-view="map">Mapa Linha</button>
+        <button class="nav" data-view="googleDrive">Google/Drive</button>
         <button class="nav" data-view="sync">☁️ Sincronizar</button>
       </nav>
       <div class="sync">Offline pronto<br><small>Dados guardados neste dispositivo</small></div>
@@ -134,6 +135,51 @@ Devem ser substituídas com a maior celeridade possível, pelo que se propõem a
             <button class="btn sync" id="syncNow2">☁️ Sincronizar agora</button>
             <button class="btn drive" id="saveDrive2">Guardar inspeção no Drive</button>
             <button class="btn stats" id="exportStats2">Atualizar estatísticas NC</button>
+          </div>
+        </div>
+      </section>
+
+    
+      <section id="googleDrive" class="view">
+        <div class="panel google-page">
+          <h3>Google Drive / Apps Script</h3>
+          <div class="google-url-row">
+            <input id="appsScriptUrlInput" placeholder="Cola aqui o URL da Web App do Apps Script">
+            <button class="btn pdf" id="saveAppsScriptUrl">Guardar ligação</button>
+          </div>
+
+          <div class="google-cards">
+            <article class="google-card">
+              <h4>Ligação</h4>
+              <p>Backend: Drive, Sheets e Calendar através do Google Apps Script.</p>
+              <button class="btn secondary" id="testGoogleConnection">Testar ligação</button>
+            </article>
+
+            <article class="google-card">
+              <h4>Pastas padrão</h4>
+              <p>Cria a estrutura EBTCC com Inspeções, PDFs, Fotos, NC, Relatórios e Hub.</p>
+              <button class="btn pdf" id="prepareDrive">Preparar Drive/Sheets</button>
+            </article>
+
+            <article class="google-card">
+              <h4>Sincronizar Drive</h4>
+              <p>Lê dados do Drive/Sheets e atualiza a APK e a WebApp.</p>
+              <button class="btn drive" id="syncDriveBtn">📁 Sincronizar Drive</button>
+            </article>
+
+            <article class="google-card">
+              <h4>Cloud</h4>
+              <p>Usa a mesma base Google na APK e na WebApp.</p>
+              <button class="btn drive" id="saveAllCloud">Guardar tudo na Cloud</button>
+              <button class="btn stats" id="loadCloud">Carregar da Cloud</button>
+              <button class="btn sync" id="syncAllCloud">🔄 Sincronizar tudo</button>
+            </article>
+
+            <article class="google-card">
+              <h4>Calendário</h4>
+              <p>Exporta intervenções e prazos para Google Calendar.</p>
+              <button class="btn pdf" id="exportCalendar">Exportar Calendar</button>
+            </article>
           </div>
         </div>
       </section>

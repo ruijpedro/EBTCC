@@ -1,29 +1,43 @@
 const CONFIG = {
   ROOT_FOLDER_ID: "12BvkIaHTFVpiNZ8S4GBrozTzipgZIEfm",
   ROOT_FOLDER_NAME: "EBTCC",
-  MASTER_SHEET_NAME: "EBTCC_MASTER"
+  MASTER_SHEET_NAME: "EBTCC_MASTER",
+  CALENDAR_NAME: "EBTCC Manutenção"
 };
 
 function doGet() {
-  return jsonOutput({ ok:true, app:"EBTCC Google Bridge", message:"Ponte ativa." });
+  return jsonOutput({ ok:true, app:"EBTCC", message:"Servidor EBTCC ativo" });
 }
 
 function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents || "{}");
-    const action = body.action;
+    const action = body.action || "";
     const payload = body.payload || {};
     const root = DriveApp.getFolderById(body.rootFolderId || CONFIG.ROOT_FOLDER_ID);
 
+    if (action === "test") return jsonOutput({ ok:true, message:"Ligação ativa", date:new Date() });
+    if (action === "prepareDrive") return jsonOutput(prepareDrive(root));
     if (action === "saveInspection") return jsonOutput(saveInspection(root, payload));
     if (action === "registerNCStats") return jsonOutput(registerNCStats(payload));
     if (action === "fullSync") return jsonOutput(fullSync(root, payload));
-    if (action === "syncMaintenanceHub") return jsonOutput(syncMaintenanceHub(payload));
+    if (action === "loadCloud") return jsonOutput(loadCloud());
+    if (action === "exportCalendar") return jsonOutput(exportCalendar(payload));
 
     return jsonOutput({ ok:false, message:"Ação desconhecida: " + action });
   } catch (err) {
     return jsonOutput({ ok:false, message:String(err), stack:err.stack });
   }
+}
+
+function prepareDrive(root) {
+  const ebtcc = getOrCreateFolder(root, "EBTCC");
+  ["Inspeções","PDFs","Fotografias","NC","Relatórios","Hub","AMV","EDF_Oeste","FenceRail_RJP"].forEach(n => getOrCreateFolder(ebtcc, n));
+  const ss = getMasterSheet();
+  getOrCreateSheet(ss, "Inspecoes");
+  getOrCreateSheet(ss, "Nao_Conformidades");
+  getOrCreateSheet(ss, "Hub_Manutencao");
+  return { ok:true, message:"Estrutura criada/confirmada." };
 }
 
 function fullSync(root, payload) {
@@ -35,9 +49,16 @@ function fullSync(root, payload) {
   return { ok:true, message:"Sincronização concluída.", count:inspections.length };
 }
 
+function loadCloud() {
+  const ss = getMasterSheet();
+  const sh = getOrCreateSheet(ss, "Inspecoes");
+  const values = sh.getDataRange().getValues();
+  return { ok:true, rows: values };
+}
+
 function saveInspection(root, data) {
-  const appFolder = getOrCreateFolder(root, "EBTCC");
-  const stationFolder = getOrCreateFolder(appFolder, safeName(data.station || "Sem_Estacao"));
+  const ebtcc = getOrCreateFolder(root, "EBTCC");
+  const stationFolder = getOrCreateFolder(ebtcc, safeName(data.station || "Sem_Estacao"));
   const pdfFolder = getOrCreateFolder(stationFolder, "PDFs");
   const photosFolder = getOrCreateFolder(stationFolder, "Fotos");
 
@@ -67,12 +88,13 @@ function registerNCStats(data) {
   return { ok:true, message:"NC atualizadas." };
 }
 
-function syncMaintenanceHub(data) {
-  const ss = getMasterSheet();
-  const sh = getOrCreateSheet(ss, "Hub_Manutencao");
-  ensureHeader(sh, ["Data","App","Estação","Tipo","Descrição","Estado","Prioridade","Responsável"]);
-  sh.appendRow([new Date(),"EBTCC",data.station||"",data.type||"",data.description||"",data.status||"",data.priority||"",data.responsible||""]);
-  return { ok:true };
+function exportCalendar(data) {
+  const cal = getOrCreateCalendar(CONFIG.CALENDAR_NAME);
+  const date = data.date ? new Date(data.date) : new Date();
+  cal.createAllDayEvent("EBTCC - " + (data.station || "Inspeção"), date, {
+    description: (data.description || "") + "\\nEstado: " + (data.status || "")
+  });
+  return { ok:true, message:"Evento criado no Calendar." };
 }
 
 function appendInspection(ss, data, pdfUrl, photoUrls) {
@@ -106,6 +128,7 @@ function getMasterSheet() {
 function getOrCreateFolder(parent, name) { const it = parent.getFoldersByName(name); return it.hasNext()?it.next():parent.createFolder(name); }
 function getOrCreateSheet(ss, name) { let sh = ss.getSheetByName(name); return sh || ss.insertSheet(name); }
 function ensureHeader(sh, headers) { if (sh.getLastRow() === 0) { sh.appendRow(headers); sh.setFrozenRows(1); } }
+function getOrCreateCalendar(name) { const cals = CalendarApp.getCalendarsByName(name); return cals.length ? cals[0] : CalendarApp.createCalendar(name); }
 function makeFileName(data, ext) { return safeName((data.number||"EBTCC")+"_"+(data.station||"Estacao")+"_"+(data.date||""))+"."+ext; }
 function makePhotoName(data, i) { return safeName((data.number||"EBTCC")+"_"+(data.station||"Estacao")+"_Foto_"+i)+".jpg"; }
 function safeName(name) { return String(name||"Sem_nome").replace(/[\\/:*?"<>|#%{}~&]/g,"_").replace(/\s+/g,"_"); }

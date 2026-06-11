@@ -3,7 +3,7 @@ export const GOOGLE_CONFIG = {
   APP_GROUP: "Manutenção Ferroviária RJP",
   DRIVE_ROOT_FOLDER_ID: "12BvkIaHTFVpiNZ8S4GBrozTzipgZIEfm",
   DRIVE_ROOT_FOLDER_NAME: "EBTCC",
-  APPS_SCRIPT_URL: "",
+  APPS_SCRIPT_URL: localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || "",
   MODULES: {
     EBTCC: true,
     EDF_OESTE: true,
@@ -12,3 +12,7 @@ export const GOOGLE_CONFIG = {
     INSPECOES_RJP: true
   }
 };
+
+export function setAppsScriptUrl(url){
+  localStorage.setItem("EBTCC_APPS_SCRIPT_URL", url || "");
+}

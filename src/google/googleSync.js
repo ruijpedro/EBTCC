@@ -1,15 +1,24 @@
-import { GOOGLE_CONFIG } from "./config.js";
+import { GOOGLE_CONFIG, setAppsScriptUrl } from "./config.js";
 
 export function googleConfigured(){
-  return Boolean(GOOGLE_CONFIG.APPS_SCRIPT_URL);
+  return Boolean(localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL);
+}
+
+export function saveAppsScriptUrl(url){
+  setAppsScriptUrl(url);
+}
+
+function getScriptUrl(){
+  return localStorage.getItem("EBTCC_APPS_SCRIPT_URL") || GOOGLE_CONFIG.APPS_SCRIPT_URL;
 }
 
 export async function sendToGoogle(action, payload){
-  if(!GOOGLE_CONFIG.APPS_SCRIPT_URL){
-    alert("Falta configurar o APPS_SCRIPT_URL em src/google/config.js");
-    return { ok:false, message:"APPS_SCRIPT_URL não configurado" };
+  const url = getScriptUrl();
+  if(!url){
+    alert("Falta configurar o URL do Apps Script em Google/Drive.");
+    return { ok:false, message:"URL Apps Script não configurado" };
   }
-  const response = await fetch(GOOGLE_CONFIG.APPS_SCRIPT_URL, {
+  const response = await fetch(url, {
     method: "POST",
     mode: "cors",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -25,7 +34,10 @@ export async function sendToGoogle(action, payload){
   return await response.json();
 }
 
+export async function testConnection(){ return await sendToGoogle("test", {}); }
+export async function prepareDrive(){ return await sendToGoogle("prepareDrive", {}); }
 export async function saveInspectionToDrive(data){ return await sendToGoogle("saveInspection", data); }
 export async function registerNCStats(data){ return await sendToGoogle("registerNCStats", data); }
-export async function syncMaintenanceHub(data){ return await sendToGoogle("syncMaintenanceHub", data); }
 export async function fullSync(data){ return await sendToGoogle("fullSync", data); }
+export async function loadCloud(){ return await sendToGoogle("loadCloud", {}); }
+export async function exportCalendar(data){ return await sendToGoogle("exportCalendar", data); }
