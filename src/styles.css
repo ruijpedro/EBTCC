@@ -117,3 +117,165 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 .btn.sync{background:#13b981;color:white}
 @media(max-width:1200px){.google-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.google-url-row,.google-cards{grid-template-columns:1fr}.topbar-logo{height:34px;max-width:145px}.brand-logo{width:132px}}
+/* =========================================================
+   EBTCC v2.3 — Correção mobile APK/WebApp
+   Reduz título Google Drive / Apps Script
+   Uniformiza APK e WebApp
+   ========================================================= */
+
+.google-page{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+.google-page h3{
+  font-size:clamp(20px,4vw,28px) !important;
+  line-height:1.2 !important;
+  margin-bottom:14px !important;
+  word-break:normal !important;
+  white-space:normal !important;
+}
+
+.google-url-row{
+  width:100%;
+}
+
+.google-card{
+  overflow:hidden;
+}
+
+.google-card h4{
+  line-height:1.2;
+}
+
+.google-card p{
+  line-height:1.35;
+}
+
+/* Telemóvel / APK Android */
+@media (max-width:768px){
+
+  main{
+    padding-top:0 !important;
+  }
+
+  .topbar{
+    min-height:64px !important;
+    padding:8px 12px !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+
+  .topbar-logo{
+    height:30px !important;
+    max-width:120px !important;
+    object-fit:contain !important;
+  }
+
+  #menuBtn{
+    font-size:24px !important;
+    min-width:38px !important;
+  }
+
+  #viewTitle{
+    font-size:22px !important;
+    line-height:1.05 !important;
+    max-width:150px !important;
+    word-break:normal !important;
+  }
+
+  .sync-status{
+    font-size:13px !important;
+    padding:7px 10px !important;
+    white-space:normal !important;
+    max-width:105px !important;
+    text-align:center !important;
+  }
+
+  .panel{
+    margin:12px !important;
+    padding:18px !important;
+    border-radius:18px !important;
+  }
+
+  .google-page h3{
+    font-size:21px !important;
+    line-height:1.15 !important;
+    margin-bottom:14px !important;
+  }
+
+  .google-url-row{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+
+  .google-url-row input{
+    width:100% !important;
+    font-size:14px !important;
+    padding:12px !important;
+  }
+
+  .google-cards{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+
+  .google-card{
+    min-height:auto !important;
+    padding:16px !important;
+    border-radius:16px !important;
+  }
+
+  .google-card h4{
+    font-size:18px !important;
+    margin-bottom:8px !important;
+  }
+
+  .google-card p{
+    font-size:14px !important;
+    min-height:auto !important;
+    margin-bottom:12px !important;
+  }
+
+  .google-card .btn{
+    width:100% !important;
+    margin:8px 0 !important;
+    text-align:center !important;
+  }
+
+  .sidebar.open{
+    width:100vw !important;
+    max-width:100vw !important;
+  }
+
+  .sidebar .brand{
+    align-items:center !important;
+  }
+
+  .brand-logo{
+    width:120px !important;
+    max-height:58px !important;
+  }
+
+  .brand h1{
+    font-size:30px !important;
+  }
+
+  .brand p{
+    font-size:18px !important;
+    line-height:1.2 !important;
+  }
+
+  .nav{
+    font-size:22px !important;
+    padding:16px 22px !important;
+  }
+
+  .big-sync{
+    font-size:18px !important;
+    padding:14px !important;
+  }
+}
