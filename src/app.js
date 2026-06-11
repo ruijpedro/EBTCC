@@ -1,7 +1,7 @@
 import { stations } from "./data/stations.js";
 import { checklist } from "./data/checklist.js";
 import { printFicha, buildPdfBlobForGoogle } from "./pdf/printFicha.js";
-import { saveInspectionToDrive, registerNCStats, syncMaintenanceHub } from "./google/googleSync.js";
+import { saveInspectionToDrive, registerNCStats, fullSync, googleConfigured } from "./google/googleSync.js";
 
 const $ = (id) => document.getElementById(id);
 const state = {
@@ -14,7 +14,7 @@ function setView(name){
   document.querySelectorAll(".nav").forEach(v => v.classList.remove("active"));
   $(name).classList.add("active");
   document.querySelector(`[data-view="${name}"]`)?.classList.add("active");
-  $("viewTitle").textContent = {dashboard:"Dashboard",stations:"Estações",inspection:"Nova Inspeção",reports:"Relatórios",map:"Mapa Linha"}[name] || "Inspeções_RJP";
+  $("viewTitle").textContent = {dashboard:"Dashboard",stations:"Estações",inspection:"Nova Inspeção",reports:"Relatórios",map:"Mapa Linha",sync:"Sincronizar"}[name] || "Inspeções_RJP";
 }
 
 function initStations(){
@@ -97,6 +97,7 @@ function initChecklist(){
       btn.classList.add("active");
       state.results[box.dataset.code] = btn.dataset.value;
       updateStats();
+setSyncUi(googleConfigured() ? "Online" : "Por configurar");
     });
   });
 }
@@ -256,6 +257,69 @@ async function syncHub(){
     });
     alert(res.ok ? "Hub de manutenção sincronizado." : "Erro: " + res.message);
   } catch(err){
+    alert("Erro na sincronização: " + err.message);
+  }
+}
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result).split(",").pop());
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+
+function setSyncUi(message){
+  const now = new Date().toLocaleString("pt-PT");
+  document.querySelectorAll("#syncStatus").forEach(el => el.textContent = message);
+  document.querySelectorAll("#googleState").forEach(el => el.textContent = googleConfigured() ? "Configurado" : "Por configurar");
+  document.querySelectorAll("#lastSync").forEach(el => el.textContent = now);
+  localStorage.setItem("ebtcc_last_sync", now);
+}
+
+async function saveToGoogleDrive(){
+  try{
+    const data = getInspectionData();
+    data.checklist = checklist;
+    const blob = await buildPdfBlobForGoogle(data, checklist);
+    data.pdfBase64 = await blobToBase64(blob);
+    const res = await saveInspectionToDrive(data);
+    setSyncUi(res.ok ? "Sincronizado" : "Erro");
+    alert(res.ok ? "PDF, fotos e estatísticas guardados no Google Drive." : "Erro Google Drive: " + (res.message || "sem detalhe"));
+  } catch(err){
+    setSyncUi("Erro");
+    alert("Erro ao guardar no Google Drive: " + err.message);
+  }
+}
+
+async function exportNCStats(){
+  try{
+    const data = getInspectionData();
+    data.checklist = checklist;
+    const res = await registerNCStats(data);
+    setSyncUi(res.ok ? "Sincronizado" : "Erro");
+    alert(res.ok ? "Estatísticas NC atualizadas no Google Sheets." : "Erro: " + res.message);
+  } catch(err){
+    setSyncUi("Erro");
+    alert("Erro ao atualizar estatísticas: " + err.message);
+  }
+}
+
+async function syncAll(){
+  try{
+    const payload = {
+      inspections: JSON.parse(localStorage.getItem("inspecoes_rjp_saved") || "[]"),
+      current: getInspectionData(),
+      lastSync: localStorage.getItem("ebtcc_last_sync") || ""
+    };
+    payload.current.checklist = checklist;
+    const res = await fullSync(payload);
+    setSyncUi(res.ok ? "Sincronizado" : "Erro");
+    alert(res.ok ? "Sincronização concluída." : "Erro de sincronização: " + (res.message || "sem detalhe"));
+  } catch(err){
+    setSyncUi("Erro");
     alert("Erro na sincronização: " + err.message);
   }
 }

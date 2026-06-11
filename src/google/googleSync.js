@@ -1,5 +1,9 @@
 import { GOOGLE_CONFIG } from "./config.js";
 
+export function googleConfigured(){
+  return Boolean(GOOGLE_CONFIG.APPS_SCRIPT_URL);
+}
+
 export async function sendToGoogle(action, payload){
   if(!GOOGLE_CONFIG.APPS_SCRIPT_URL){
     alert("Falta configurar o APPS_SCRIPT_URL em src/google/config.js");
@@ -24,3 +28,4 @@ export async function sendToGoogle(action, payload){
 export async function saveInspectionToDrive(data){ return await sendToGoogle("saveInspection", data); }
 export async function registerNCStats(data){ return await sendToGoogle("registerNCStats", data); }
 export async function syncMaintenanceHub(data){ return await sendToGoogle("syncMaintenanceHub", data); }
+export async function fullSync(data){ return await sendToGoogle("fullSync", data); }

@@ -1,5 +1,5 @@
 export const GOOGLE_CONFIG = {
-  APP_NAME: "Inspeções_RJP",
+  APP_NAME: "EBTCC",
   APP_GROUP: "Manutenção Ferroviária RJP",
   DRIVE_ROOT_FOLDER_ID: "12BvkIaHTFVpiNZ8S4GBrozTzipgZIEfm",
   DRIVE_ROOT_FOLDER_NAME: "EBTCC",

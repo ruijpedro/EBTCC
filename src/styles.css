@@ -65,3 +65,24 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
 .group-title{background:#EAF5EF;color:#006B32}
 .sidebar{background:linear-gradient(180deg,#00843D,#006B32)!important}
 @media(max-width:900px){.topbar-logo{height:34px;max-width:145px}.brand-logo{width:132px}}
+
+/* EBTCC IP Corporate v2 */
+:root{
+  --green:#008752;
+  --green2:#006B32;
+  --light:#F3F5F4;
+  --line:#DADDE0;
+  --red:#C62828;
+  --amber:#F2A900;
+}
+.brand-logo{width:132px;max-height:74px;object-fit:contain;background:white;border-radius:12px;padding:6px}
+.topbar-logo{height:42px;max-width:190px;object-fit:contain}
+.sync-status{margin-left:auto;background:#e7f1eb;color:#006B32;padding:8px 12px;border-radius:999px;font-weight:700}
+.btn.drive{background:#1a73e8;color:white}
+.btn.stats{background:#188038;color:white}
+.btn.sync{background:#5f6368;color:white}
+.sync-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#f8faf9;border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.sidebar{background:linear-gradient(180deg,#008752,#006B32)!important}
+.card strong{color:#008752}
+.group-title{background:#EAF5EF;color:#006B32}
+@media(max-width:900px){.sync-panel{grid-template-columns:1fr}.topbar-logo{height:34px;max-width:145px}.brand-logo{width:132px}}
