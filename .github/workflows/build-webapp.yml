@@ -1,30 +1,66 @@
 name: Build WebApp
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: github-pages-ebtcc
+  cancel-in-progress: true
+
 jobs:
   build-webapp:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Prepare WebApp
-        run: |
-          rm -rf webapp
-          mkdir webapp
-          cp index.html manifest.json service-worker.js webapp/
-          cp -r src webapp/src
-          cp -r assets webapp/assets
-      - uses: actions/upload-pages-artifact@v3
+      - name: Checkout projeto
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
         with:
-          path: webapp
+          node-version: 22
+
+      - name: Verificar ficheiros
+        run: |
+          ls -la
+          test -f index.html
+          test -f src/app.js
+          test -f src/styles.css
+
+      - name: Criar dist
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          cp index.html dist/
+          cp manifest.json dist/ 2>/dev/null || true
+          cp service-worker.js dist/ 2>/dev/null || true
+          cp -r assets dist/assets 2>/dev/null || true
+          cp -r src dist/src
+          touch dist/.nojekyll
+          echo "Conteúdo dist:"
+          find dist -maxdepth 3 -type f | sort
+
+      - name: Guardar artifact WebApp
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBTCC_webapp_dist
+          path: dist
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
   deploy-webapp:
     needs: build-webapp
@@ -32,6 +68,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - id: deployment
+      - name: Publicar WebApp
+        id: deployment
         uses: actions/deploy-pages@v4
