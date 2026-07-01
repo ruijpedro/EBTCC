@@ -279,3 +279,23 @@ textarea{min-height:120px}.station-list{margin-top:14px}.station-row{display:fle
     padding:14px !important;
   }
 }
+
+
+.line-select-box{
+  display:block;
+  font-weight:700;
+  margin:0 0 14px;
+  color:#1e2722;
+}
+.line-select-box select{
+  display:block;
+  width:100%;
+  margin-top:6px;
+  min-height:46px;
+  border:1px solid #d8dfdc;
+  border-radius:14px;
+  background:#fff;
+  padding:10px 14px;
+  font-size:16px;
+  color:#1e2722;
+}

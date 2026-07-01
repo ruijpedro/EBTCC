@@ -48,12 +48,14 @@
         </div>
         <div class="panel">
           <h3>Estações do troço</h3>
+          <label class="line-select-box">Linha<select id="lineSelectDashboard"></select></label>
           <div id="stationChips" class="chips"></div>
         </div>
       </section>
 
       <section id="stations" class="view">
         <div class="panel">
+          <label class="line-select-box">Linha<select id="lineSelectStations"></select></label>
           <input id="stationSearch" class="search" placeholder="Pesquisar estação..." />
           <div id="stationList" class="station-list"></div>
         </div>
@@ -62,7 +64,7 @@
       <section id="inspection" class="view">
         <div class="panel">
           <div class="form-grid">
-            <label>Linha<select id="lineSelect"></select></label>
+            <label>Linha<select id="lineSelectInspection"></select></label>
             <label>Estação<select id="stationSelect"></select></label>
             <label>Data<input id="dateInput" type="date"></label>
             <label>Inspetor<input id="inspectorInput" value=""></label>

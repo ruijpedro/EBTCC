@@ -15,7 +15,8 @@ import {
 
 const $ = (id) => document.getElementById(id);
 
-let currentStations = stations;
+let currentLine = "Linha do Oeste";
+let currentStations = railwayLines[currentLine] || stations;
 
 const state = {
   results: {},
@@ -49,22 +50,41 @@ function updateSyncUi(message){
 }
 
 function initStations(){
-  const lineSelect = $("lineSelect");
-  if(lineSelect){
-    const lines = Object.keys(railwayLines);
-    lineSelect.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join("");
-    lineSelect.value = lines[0] || "";
-    currentStations = railwayLines[lineSelect.value] || [];
-    lineSelect.addEventListener("change", () => {
-      currentStations = railwayLines[lineSelect.value] || [];
+  initLineSelectors();
+  refreshStationUi();
+}
+
+function initLineSelectors(){
+  const lines = Object.keys(railwayLines);
+  ["lineSelectDashboard","lineSelectStations","lineSelectInspection"].forEach(id => {
+    const el = $(id);
+    if(!el) return;
+    el.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join("");
+    el.value = currentLine;
+    el.addEventListener("change", () => {
+      currentLine = el.value;
+      currentStations = railwayLines[currentLine] || [];
+      syncLineSelectors();
       refreshStationUi();
     });
-  }
-  refreshStationUi();
+  });
+}
+
+function syncLineSelectors(){
+  ["lineSelectDashboard","lineSelectStations","lineSelectInspection"].forEach(id => {
+    const el = $(id);
+    if(el && el.value !== currentLine) el.value = currentLine;
+  });
 }
 
 function refreshStationUi(){
   if($("totalStations")) $("totalStations").textContent = currentStations.length;
+  const routeText = currentLine === "Linha do Oeste" ? "Sabugo → Carriço" : currentLine;
+  document.querySelectorAll(".card span").forEach(span => {
+    if(span.textContent.includes("Seleciona") || span.textContent.includes("Sabugo") || span.textContent.includes("Carriço")) {
+      span.textContent = routeText;
+    }
+  });
   if($("stationChips")) $("stationChips").innerHTML = currentStations.map(s => `<span class="chip">${s}</span>`).join("");
   if($("stationSelect")) $("stationSelect").innerHTML = `<option value="">Selecionar estação</option>` + currentStations.map(s => `<option>${s}</option>`).join("");
   renderStationList(currentStations);
@@ -106,7 +126,7 @@ function renderMap(){
     const st = stationStatus(s);
     return `<div class="map-row" data-map-station="${s}">
       <span class="map-node ${st.cls}">${String(i+1).padStart(2,"0")}</span>
-      <span><span class="map-name">${s}</span><br><span class="map-meta">${$("lineSelect")?.value || "Linha"}</span></span>
+      <span><span class="map-name">${s}</span><br><span class="map-meta">${currentLine}</span></span>
       <span class="map-badge">${st.label}</span>
     </div>`;
   }).join("");
@@ -153,7 +173,7 @@ function nextInspectionNumber(){
 function getInspectionData(){
   return {
     number: $("inspectionNumberInput").value || nextInspectionNumber(),
-    line: $("lineSelect")?.value || "",
+    line: currentLine,
     station: $("stationSelect").value,
     date: $("dateInput").value,
     inspector: $("inspectorInput").value,
