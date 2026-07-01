@@ -38,3 +38,12 @@
 - A lista de estações muda automaticamente conforme a linha escolhida.
 - Campos mantidos mas sem preenchimento automático.
 - Observações em branco.
+
+
+## v6 — Correção WebApp
+
+Workflow `Build WebApp` corrigido para app estática:
+- cria pasta `dist`;
+- copia `index.html`, `src`, `assets`, `manifest.json` e `service-worker.js`;
+- adiciona `.nojekyll`;
+- publica no GitHub Pages com concurrency para evitar deployments em conflito.

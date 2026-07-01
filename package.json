@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "cap:add:android": "npx cap add android",
-    "cap:sync": "npx cap sync android"
+    "cap:sync": "npx cap sync android",
+    "build": "rm -rf dist && mkdir -p dist && cp -r index.html manifest.json service-worker.js assets src dist/",
+    "preview": "npx http-server dist"
   },
   "dependencies": {
     "@capacitor/android": "latest",
     "@capacitor/cli": "latest",
     "@capacitor/core": "latest"
-  }
+  },
+  "devDependencies": {}
 }
