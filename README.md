@@ -29,3 +29,12 @@
 5. Reinicia o telemóvel.
 6. Instala a nova APK.
 7. Na WebApp, faz Ctrl+F5 para limpar cache.
+
+
+## v3 — Opção de Linha
+
+- Campo **Linha** adicionado antes da Estação.
+- Permite escolher **Linha do Oeste** ou **Linha da Beira Alta**.
+- A lista de estações muda automaticamente conforme a linha escolhida.
+- Campos mantidos mas sem preenchimento automático.
+- Observações em branco.

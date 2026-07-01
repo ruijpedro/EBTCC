@@ -16,7 +16,7 @@
         <img class="brand-logo" src="assets/ip-logo.png" alt="Infraestruturas de Portugal">
         <div>
           <h1>EBTCC</h1>
-          <p>IP · Manutenção Ferroviária · Linha do Oeste</p>
+          <p>IP · Manutenção Ferroviária · Multi-linha</p>
         </div>
       </div>
       <nav>
@@ -41,7 +41,7 @@
 
       <section id="dashboard" class="view active">
         <div class="cards">
-          <article class="card"><small>Edifícios / Estações</small><strong id="totalStations">0</strong><span>Sabugo → Carriço</span></article>
+          <article class="card"><small>Edifícios / Estações</small><strong id="totalStations">0</strong><span>Seleciona uma linha</span></article>
           <article class="card"><small>Inspeções</small><strong id="totalInspections">0</strong><span>histórico local</span></article>
           <article class="card"><small>NC abertas</small><strong id="totalNC">0</strong><span>não conformidades</span></article>
           <article class="card"><small>Última intervenção</small><strong id="lastStation">—</strong><span>última inspeção</span></article>
@@ -62,16 +62,17 @@
       <section id="inspection" class="view">
         <div class="panel">
           <div class="form-grid">
+            <label>Linha<select id="lineSelect"></select></label>
             <label>Estação<select id="stationSelect"></select></label>
             <label>Data<input id="dateInput" type="date"></label>
-            <label>Inspetor<input id="inspectorInput" value=" "></label>
-            <label>Utilizador de Rede<input id="networkUserInput" value=" "></label>
+            <label>Inspetor<input id="inspectorInput" value=""></label>
+            <label>Utilizador de Rede<input id="networkUserInput" value=""></label>
           </div>
           <div class="form-grid">
-            <label>Descrição<input id="descriptionInput" value="LO_MPS_BT_CC_"></label>
-            <label>Subdescrição<input id="subDescriptionInput" value=" "></label>
-            <label>Segmento<input id="segmentInput" value="00231"></label>
-            <label>PKI / PKF<input id="pkInput" value="17:840 / 215:227"></label>
+            <label>Descrição<input id="descriptionInput" value=""></label>
+            <label>Subdescrição<input id="subDescriptionInput" value=""></label>
+            <label>Segmento<input id="segmentInput" value=""></label>
+            <label>PKI / PKF<input id="pkInput" value=""></label>
           </div>
         </div>
 
@@ -88,11 +89,11 @@
         </div>
 
         <div class="panel">
-          <label>Observações<textarea id="observationsInput"> </textarea></label>
+          <label>Observações<textarea id="observationsInput"></textarea></label>
           <div class="form-grid">
             <label>Executou<input id="executedByInput"></label>
-            <label>Status<input id="statusInput" value="Aprovada"></label>
-            <label>Responsável Equipa Inspeção<input id="responsibleInput" value="lpoliveira"></label>
+            <label>Status<input id="statusInput" value=""></label>
+            <label>Responsável Equipa Inspeção<input id="responsibleInput" value=""></label>
             <label>N.º Inspeção<input id="inspectionNumberInput" readonly></label>
           </div>
           <div class="actions">
@@ -114,8 +115,8 @@
 
       <section id="map" class="view">
         <div class="panel">
-          <h3>Mapa esquemático — Linha do Oeste</h3>
-          <p class="hint">Troço operacional Sabugo → Carriço. Toca numa estação para abrir nova inspeção.</p>
+          <h3>Mapa esquemático — Multi-linha</h3>
+          <p class="hint">Troço operacional Seleciona uma linha. Toca numa estação para abrir nova inspeção.</p>
           <div id="lineMap" class="line-map"></div>
         </div>
       </section>

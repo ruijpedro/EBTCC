@@ -1,4 +1,4 @@
-import { stations } from "./data/stations.js";
+import { stations, railwayLines } from "./data/stations.js";
 import { checklist } from "./data/checklist.js";
 import { printFicha, buildPdfBlobForGoogle } from "./pdf/printFicha.js";
 import {
@@ -15,8 +15,10 @@ import {
 
 const $ = (id) => document.getElementById(id);
 
+let currentStations = stations;
+
 const state = {
-  results: JSON.parse(localStorage.getItem("ebtcc_results") || "{}"),
+  results: {},
   photos: []
 };
 
@@ -47,10 +49,25 @@ function updateSyncUi(message){
 }
 
 function initStations(){
-  $("totalStations").textContent = stations.length;
-  $("stationChips").innerHTML = stations.map(s => `<span class="chip">${s}</span>`).join("");
-  $("stationSelect").innerHTML = stations.map(s => `<option>${s}</option>`).join("");
-  renderStationList(stations);
+  const lineSelect = $("lineSelect");
+  if(lineSelect){
+    const lines = Object.keys(railwayLines);
+    lineSelect.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join("");
+    lineSelect.value = lines[0] || "";
+    currentStations = railwayLines[lineSelect.value] || [];
+    lineSelect.addEventListener("change", () => {
+      currentStations = railwayLines[lineSelect.value] || [];
+      refreshStationUi();
+    });
+  }
+  refreshStationUi();
+}
+
+function refreshStationUi(){
+  if($("totalStations")) $("totalStations").textContent = currentStations.length;
+  if($("stationChips")) $("stationChips").innerHTML = currentStations.map(s => `<span class="chip">${s}</span>`).join("");
+  if($("stationSelect")) $("stationSelect").innerHTML = `<option value="">Selecionar estação</option>` + currentStations.map(s => `<option>${s}</option>`).join("");
+  renderStationList(currentStations);
   renderMap();
 }
 
@@ -66,7 +83,6 @@ function stationStatus(station){
 
 function openInspectionForStation(station){
   $("stationSelect").value = station;
-  $("descriptionInput").value = `LO_MPS_BT_CC_${station} (S)`;
   setView("inspection");
 }
 
@@ -90,7 +106,7 @@ function renderMap(){
     const st = stationStatus(s);
     return `<div class="map-row" data-map-station="${s}">
       <span class="map-node ${st.cls}">${String(i+1).padStart(2,"0")}</span>
-      <span><span class="map-name">${s}</span><br><span class="map-meta">Linha do Oeste · Sabugo → Carriço</span></span>
+      <span><span class="map-name">${s}</span><br><span class="map-meta">${$("lineSelect")?.value || "Linha"}</span></span>
       <span class="map-badge">${st.label}</span>
     </div>`;
   }).join("");
@@ -122,7 +138,7 @@ function initChecklist(){
       box.querySelectorAll("button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       state.results[box.dataset.code] = btn.dataset.value;
-      localStorage.setItem("ebtcc_results", JSON.stringify(state.results));
+      localStorage.removeItem("ebtcc_results");
       updateStats();
     });
   });
@@ -137,6 +153,7 @@ function nextInspectionNumber(){
 function getInspectionData(){
   return {
     number: $("inspectionNumberInput").value || nextInspectionNumber(),
+    line: $("lineSelect")?.value || "",
     station: $("stationSelect").value,
     date: $("dateInput").value,
     inspector: $("inspectorInput").value,
@@ -155,17 +172,31 @@ function getInspectionData(){
   };
 }
 
+
+function clearInspectionForm(){
+  [
+    "inspectorInput","networkUserInput","descriptionInput","subDescriptionInput",
+    "segmentInput","pkInput","observationsInput","executedByInput",
+    "statusInput","responsibleInput","dateInput"
+  ].forEach(id => { if($(id)) $(id).value = ""; });
+  if($("stationSelect")) $("stationSelect").value = "";
+  state.results = {};
+  state.photos = [];
+  localStorage.removeItem("ebtcc_results");
+  initChecklist();
+  renderPhotos();
+}
+
 function saveInspection(){
   const data = getInspectionData();
   const list = JSON.parse(localStorage.getItem("ebtcc_saved") || "[]");
   list.unshift({ ...data, savedAt: new Date().toISOString() });
   localStorage.setItem("ebtcc_saved", JSON.stringify(list));
-  localStorage.setItem("ebtcc_results", JSON.stringify(state.results));
-  state.photos = [];
-  renderPhotos();
+  localStorage.removeItem("ebtcc_results");
+  clearInspectionForm();
   $("inspectionNumberInput").value = nextInspectionNumber();
   renderReports();
-  renderStationList(stations);
+  renderStationList(currentStations);
   renderMap();
   updateStats();
   alert("Inspeção guardada.");
@@ -307,7 +338,7 @@ function escapeAttr(value){ return String(value || "").replace(/"/g, "&quot;"); 
 function bindEvents(){
   document.querySelectorAll(".nav").forEach(btn => btn.addEventListener("click", () => setView(btn.dataset.view)));
   $("menuBtn")?.addEventListener("click", () => document.querySelector(".sidebar")?.classList.toggle("open"));
-  $("stationSearch")?.addEventListener("input", e => renderStationList(stations.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase()))));
+  $("stationSearch")?.addEventListener("input", e => renderStationList(currentStations.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase()))));
   $("saveInspection")?.addEventListener("click", saveInspection);
   $("generatePdf")?.addEventListener("click", () => printFicha(getInspectionData(), checklist));
   $("photoInput")?.addEventListener("change", e => handlePhotos(e.target.files));
@@ -337,7 +368,7 @@ function bindEvents(){
   $("exportCalendar")?.addEventListener("click", () => exportToCalendar().catch(e => alert(e.message)));
 }
 
-$("dateInput").valueAsDate = new Date();
+// Data em branco por defeito.
 $("inspectionNumberInput").value = nextInspectionNumber();
 initStations();
 initChecklist();
